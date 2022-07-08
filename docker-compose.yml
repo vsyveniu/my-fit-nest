@@ -1,0 +1,34 @@
+version: '3'
+services:
+  db:
+    container_name: myfit_postgres
+    image: postgres:14.4
+    restart: always
+    environment:
+      - POSTGRES_USER=vsyveniu
+      - POSTGRES_PASSWORD=423ps4212
+      - POSTGRES_DB=myFit
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db_volume:/var/lib/postgreqsl/data
+  rabbitmq:
+    image: rabbitmq:3.10.5
+    container_name: myfit_rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    restart: always
+#  app:
+#    container_name: myFit
+#    image: node:16.15.1-alpine
+#    volumes:
+#      - ./:/home/node/app
+#    working_dir: /home/node/app
+#    command: "yarn rw dev"
+#    depends_on:
+#      - db
+#    restart: always
+#    ports:
+#      - 9229:9229
+#      - 8910:8910
