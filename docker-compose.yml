@@ -19,6 +19,14 @@ services:
       - 5672:5672
       - 15672:15672
     restart: always
+  redis:
+    image: redis:7.0.4
+    container_name: myfit_redis
+    volumes:
+      - ./redis_volume:/var/lib/redis
+      - ./redis_volume:/usr/local/etc/redis/redis.conf
+    ports:
+      - 6379:6379
 #  app:
 #    container_name: myFit
 #    image: node:16.15.1-alpine

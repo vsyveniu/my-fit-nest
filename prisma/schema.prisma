@@ -11,15 +11,29 @@ model User {
   id          Int      @id @default(autoincrement())
   email       String   @unique
   password    String
+  phone       String   @unique
   chains      Chain[]
+  profile     Profile?
+  createdAt   DateTime @default(now())
+  updatedArAt DateTime @updatedAt
+}
+
+model Profile {
+  id          Int      @id @default(autoincrement())
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      Int?     @unique
+  name        String   @unique
+  avatar      String
   createdAt   DateTime @default(now())
   updatedArAt DateTime @updatedAt
 }
 
 model Chain {
   id          Int      @id @default(autoincrement())
-  User        User?    @relation(fields: [userId], references: [id])
+  name        String   @default("unnamed")
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int?
+  isActive    Boolean  @default(false)
   days        Day[]
   createdAt   DateTime @default(now())
   updatedArAt DateTime @updatedAt
@@ -27,27 +41,68 @@ model Chain {
 
 model Day {
   id          Int       @id @default(autoincrement())
-  Chain       Chain?    @relation(fields: [chainId], references: [id])
+  chain       Chain?    @relation(fields: [chainId], references: [id])
   chainId     Int?
+  isToday     Boolean   @default(false)
+  type        String    @default("free")
   workouts    Workout[]
   createdAt   DateTime  @default(now())
   updatedArAt DateTime  @updatedAt
 }
 
 model Workout {
-  id          Int        @id @default(autoincrement())
-  Day         Day?       @relation(fields: [dayId], references: [id])
+  id          Int                   @id @default(autoincrement())
+  day         Day?                  @relation(fields: [dayId], references: [id], onDelete: Cascade)
   dayId       Int?
-  exercises   Exercise[]
-  createdAt   DateTime   @default(now())
-  updatedArAt DateTime   @updatedAt
+  exercises   ExercisesOnWorkouts[]
+  createdAt   DateTime              @default(now())
+  updatedArAt DateTime              @updatedAt
 }
 
 model Exercise {
+  id            Int                   @id @default(autoincrement())
+  workoutId     Int
+  workout       ExercisesOnWorkouts[]
+  title         String
+  description   String
+  type          String
+  reps          Int?
+  weight        Int?
+  distance      Int?
+  timeAction    Int?
+  timeRest      Int?
+  completedReps Int?
+  completedTime Int?
+  muscleGroup   String?
+  image         String?
+  video         String?
+  isPublic      Boolean               @default(false)
+  createdAt     DateTime              @default(now())
+  updatedArAt   DateTime              @updatedAt
+}
+
+model ExercisesOnWorkouts {
+  workout    Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  workoutId  Int
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  exerciseId Int
+
+  @@id([workoutId, exerciseId])
+}
+
+model CommonExercise {
   id          Int      @id @default(autoincrement())
-  userId      Int
-  workoutId   Int
-  Workout     Workout  @relation(fields: [workoutId], references: [id])
+  title       String
+  description String
+  type        String
+  reps        Int?
+  weight      Int?
+  distance    Int?
+  timeAction  Int?
+  timeRest    Int?
+  muscleGroup String?
+  image       String?
+  video       String?
   createdAt   DateTime @default(now())
   updatedArAt DateTime @updatedAt
 }

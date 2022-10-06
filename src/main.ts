@@ -1,10 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+//import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import { ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
+  const app = await NestFactory.create(AppModule, { cors: { credentials: true, origin: process.env.FRONT_APP_URL } });
 
   /*  app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.TCP,
@@ -25,7 +27,24 @@ async function bootstrap() {
       },
     },
   });
+  /* 
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.REDIS,
+    options: {
+      host: 'localhost',
+      port: 6379,
+    },
+  }); */
 
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      stopAtFirstError: true,
+    }),
+  );
+
+  app.use(cookieParser());
   await app.startAllMicroservices();
   await app.listen(3000);
 }
